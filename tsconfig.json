@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./server",
+        "outDir": "./dist",
+        "module": "commonjs", // ES記法(import/export)で書いたものをTS→JS変換時にrequire構文に直してくれる!!
+        "esModuleInterop": true
+    }
+}
