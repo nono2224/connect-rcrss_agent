@@ -1,17 +1,16 @@
 import Proto from "../proto/Proto";
 import * as net from "net";
+import Command from "./Command";
 
-export default class AK_Acknowledge {
+export default class AK_Acknowledge extends Command {
     requestId: number;
     agentId: number;
 
     constructor(requestId: number, agentId: number) {
+        super();
+
         this.requestId = requestId;
         this.agentId = agentId;
-    }
-
-    getAgentId() {
-        return this.agentId;
     }
 
     send(client: net.Socket) {

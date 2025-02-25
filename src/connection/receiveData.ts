@@ -1,6 +1,6 @@
 import * as proto from "../proto/RCRSProto_pb";
-import sendCommand from "./sendCommand";
 import AK_Acknowledge from "../commands/AK_Acknowledge";
+import * as urn from "../URN/URN";
 
 export default class ReceiveData {
     buffer = Buffer.alloc(0);
@@ -46,22 +46,15 @@ export default class ReceiveData {
             emit("receiveData", res);
 
             // 帰ってきたメッセージのURNがAKConnectOKのとき
-            if (res.getUrn() == 0x0114) {
-                const res_requestId = res
-                    .getComponentsMap()
-                    .get(0x0200 | 1)
-                    .getIntvalue(); // requestId
-                agentId = res
-                    .getComponentsMap()
-                    .get(0x0200 | 2)
-                    .getEntityid(); // agentId
+            if (res.getUrn() === urn.URN_MAP_R["KA_CONNECT_OK"]) {
+                const res_requestId = res.getComponentsMap().get(urn.URN_MAP_R["RequestID"]).getIntvalue(); // requestId
+                agentId = res.getComponentsMap().get(urn.URN_MAP_R["AgentID"]).getEntityid(); // agentId
 
                 new AK_Acknowledge(res_requestId, agentId).send(client);
             }
 
             if (res.getUrn() == 0x116) {
                 currentStep = res.getComponentsMap().get(0x020e).getIntvalue(); // 現在のステップを更新
-                sendCommand(); // コマンドを送信 (キューにコマンドがあればそれも処理)
             }
         }
     }
