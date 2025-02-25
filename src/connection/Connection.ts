@@ -1,7 +1,9 @@
 import { EventEmitter } from "events";
-import AK_Connect from "./AK_Connect";
+import AK_Connect from "./../commands/AK_Connect";
 import { exit } from "process";
-import receiveData from "./receiveData";
+import * as net from "net";
+import ReceiveData from "./ReceiveData";
+import { Socket } from "dgram";
 
 export class Connection extends EventEmitter {
     agentType: string;
@@ -9,10 +11,10 @@ export class Connection extends EventEmitter {
     requestId: number;
     port: number;
     host: string;
-    client;
-    buffer = Buffer.alloc(0);
-    agentId;
-    currentStep;
+    receiveData: ReceiveData;
+    client: net.Socket;
+    agentId: number;
+    currentStep: number;
     commandQueue = [];
 
     constructor(agentType: string, agentName: string, requestId: number, port: number, host: string) {
@@ -24,17 +26,17 @@ export class Connection extends EventEmitter {
         this.port = port;
         this.host = host;
 
-        (async () => {
-            if (agentType === "POLICE_FORCE") {
-                this.client = await AK_Connect("POLICE_FORCE", agentName, requestId, port, host);
-            } else {
-                console.error("対象のエージェントが見つかりません");
-                exit;
-            }
+        if (agentType === "POLICE_FORCE") {
+            this.client = new AK_Connect("POLICE_FORCE", agentName, requestId, port, host).connectToServer();
+        } else {
+            console.error("対象のエージェントが見つかりません");
+            exit;
+        }
 
-            await this.client.on("data", (data) => {
-                receiveData(this.buffer, data, this.emit.bind(this), this.agentId, this.client, this.currentStep);
-            });
-        })();
+        this.receiveData = new ReceiveData();
+
+        this.client.on("data", (data) => {
+            this.receiveData.receive(data, this.emit.bind(this), this.agentId, this.client, this.currentStep);
+        });
     }
 }
