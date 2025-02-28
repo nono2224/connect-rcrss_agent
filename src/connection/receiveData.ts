@@ -7,7 +7,7 @@ export default class ReceiveData {
 
     constructor() {}
 
-    receive(data, emit, agentId, client, currentStep) {
+    receive(data, emit, main) {
         // 受信データをバッファに追加
         this.buffer = Buffer.concat([this.buffer, data]);
 
@@ -48,13 +48,13 @@ export default class ReceiveData {
             // 帰ってきたメッセージのURNがAKConnectOKのとき
             if (res.getUrn() === urn.URN_MAP_R["KA_CONNECT_OK"]) {
                 const res_requestId = res.getComponentsMap().get(urn.URN_MAP_R["RequestID"]).getIntvalue(); // requestId
-                agentId = res.getComponentsMap().get(urn.URN_MAP_R["AgentID"]).getEntityid(); // agentId
+                main.agentId = res.getComponentsMap().get(urn.URN_MAP_R["AgentID"]).getEntityid(); // agentId
 
-                new AK_Acknowledge(res_requestId, agentId).send(client);
+                new AK_Acknowledge(res_requestId, main.agentId).send(main.client);
             }
 
             if (res.getUrn() == 0x116) {
-                currentStep = res.getComponentsMap().get(0x020e).getIntvalue(); // 現在のステップを更新
+                main.currentStep = res.getComponentsMap().get(0x020e).getIntvalue(); // 現在のステップを更新
             }
         }
     }

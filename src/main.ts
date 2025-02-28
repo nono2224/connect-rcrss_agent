@@ -3,14 +3,14 @@ import { Connection } from "./connection/Connection";
 import * as net from "net";
 
 export class Main {
-    currentStep: number;
+    currentStep: number = 1;
     agentId: number;
     client: net.Socket;
 
     constructor() {}
 
     connect(agentType: string = "POLICE_FORCE", agentName: string = "ringo", requestId: number = 9999, port: number = 27931, host: string = "localhost") {
-        return new Connection(agentType, agentName, requestId, port, host, this.currentStep, this.agentId, this.client);
+        return new Connection(agentType, agentName, requestId, port, host, this);
     }
 
     sendCommand(command: HumanCommand) {

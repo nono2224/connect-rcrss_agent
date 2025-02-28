@@ -20,12 +20,12 @@ export default class Proto {
     }
 
     send(client: net.Socket) {
+        console.log(JSON.stringify(this.message.toObject()));
+
         const buffer = this.message.serializeBinary();
         const sizeBuffer = new Uint8Array([(buffer.length >> 24) & 255, (buffer.length >> 16) & 255, (buffer.length >> 8) & 255, buffer.length & 255]);
         client.write(sizeBuffer);
         client.write(buffer);
-
-        console.log(JSON.stringify(this.message.toObject()));
     }
 
     setMessageMapIntValue(type: string, res: number) {
@@ -60,6 +60,18 @@ export default class Proto {
         const map = new proto.MessageComponentProto();
 
         map.setEntityid(res);
+
+        this.messageMap.set(urn.URN_MAP_R[type], map);
+    }
+
+    setMessageMapEntityIdListValue(type: string, res: number[]) {
+        const map = new proto.MessageComponentProto();
+
+        const IntListProto = new proto.IntListProto();
+        for (const num of res) {
+            IntListProto.addValues(num);
+        }
+        map.setEntityidlist(IntListProto);
 
         this.messageMap.set(urn.URN_MAP_R[type], map);
     }

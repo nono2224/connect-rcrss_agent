@@ -10,10 +10,12 @@ export default abstract class extends Command {
     abstract createProto(): Proto;
 
     send(agentId: number, currentStep: number, client: net.Socket) {
-        const proto = this.createProto();
+        const proto: Proto = this.createProto();
+
+        const nextStep: number = currentStep + 1;
 
         proto.setMessageMapEntityIdValue("AgentID", agentId);
-        proto.setMessageMapIntValue("Time", currentStep);
+        proto.setMessageMapIntValue("Time", nextStep);
 
         proto.send(client);
     }
