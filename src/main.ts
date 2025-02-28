@@ -3,7 +3,7 @@ import { Connection } from "./connection/Connection";
 import * as net from "net";
 
 export class Main {
-    currentStep: number = 1;
+    currentStep: number;
     agentId: number;
     client: net.Socket;
 
