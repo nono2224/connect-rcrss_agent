@@ -25,9 +25,15 @@ export class Connection extends EventEmitter {
         (async () => {
             if (agentType === "POLICE_FORCE") {
                 main.client = await new AK_Connect("POLICE_FORCE", agentName, requestId, port, host).connectToServer();
+            } else if (agentType === "AMBULANCE_TEAM") {
+                main.client = await new AK_Connect("AMBULANCE_TEAM", agentName, requestId, port, host).connectToServer();
+            } else if (agentType === "FIRE_BRIGADE") {
+                main.client = await new AK_Connect("FIRE_BRIGADE", agentName, requestId, port, host).connectToServer();
+            } else if (agentType === "CIVILIAN") {
+                main.client = await new AK_Connect("CIVILIAN", agentName, requestId, port, host).connectToServer();
             } else {
                 console.error("対象のエージェントが見つかりません");
-                exit;
+                return;
             }
 
             main.client.on("data", (data) => {

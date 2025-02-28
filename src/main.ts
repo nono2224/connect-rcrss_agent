@@ -14,7 +14,11 @@ export class Main {
     }
 
     sendCommand(command: HumanCommand) {
-        command.send(this.agentId, this.currentStep, this.client);
+        if (this.client) {
+            command.send(this.agentId, this.currentStep, this.client);
+        } else {
+            console.error("接続されていません");
+        }
     }
 
     getCurrentStep() {

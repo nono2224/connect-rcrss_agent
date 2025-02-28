@@ -7,9 +7,13 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
+const connectAgent = "CIVILIAN";
+
 const app = new Main();
 
-const connect = app.connect();
+let connect;
+
+connect = app.connect(connectAgent);
 
 connect.on("receiveData", (data) => {
     // console.log(data.toObject());
