@@ -49,6 +49,7 @@ export default class ReceiveData {
             if (res.getUrn() === urn.URN_MAP_R["KA_CONNECT_OK"]) {
                 const res_requestId = res.getComponentsMap().get(urn.URN_MAP_R["RequestID"]).getIntvalue(); // requestId
                 main.agentId = res.getComponentsMap().get(urn.URN_MAP_R["AgentID"]).getEntityid(); // agentId
+                main.currentStep = 0;
 
                 new AK_Acknowledge(res_requestId, main.agentId).send(main.client);
             }
