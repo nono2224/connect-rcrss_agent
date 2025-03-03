@@ -1,13 +1,16 @@
 import * as proto from "../proto/RCRSProto_pb";
 import AK_Acknowledge from "../commands/AK_Acknowledge";
 import * as urn from "../URN/URN";
+import { Main } from "../main";
 
 export default class ReceiveData {
-    buffer = Buffer.alloc(0);
+    buffer;
 
-    constructor() {}
+    constructor() {
+        this.buffer = Buffer.alloc(0);
+    }
 
-    receive(data, emit, main) {
+    receive(data: Buffer, main: Main) {
         // 受信データをバッファに追加
         this.buffer = Buffer.concat([this.buffer, data]);
 
@@ -40,10 +43,12 @@ export default class ReceiveData {
                 console.error("this.buffer content:", this.buffer);
                 console.error("Message data content:", messageData);
 
+                main.emit("error", error);
+
                 return;
             }
 
-            emit("receiveData", res);
+            main.emit("receiveData", res);
 
             // 帰ってきたメッセージのURNがAKConnectOKのとき
             if (res.getUrn() === urn.URN_MAP_R["KA_CONNECT_OK"]) {
@@ -54,8 +59,8 @@ export default class ReceiveData {
                 new AK_Acknowledge(res_requestId, main.agentId).send(main.client);
             }
 
-            if (res.getUrn() == 0x116) {
-                main.currentStep = res.getComponentsMap().get(0x020e).getIntvalue(); // 現在のステップを更新
+            if (res.getUrn() == urn.URN_MAP_R["KA_SENSE"]) {
+                main.currentStep = res.getComponentsMap().get(urn.URN_MAP_R["Time"]).getIntvalue(); // 現在のステップを更新
             }
         }
     }

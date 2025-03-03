@@ -1,4 +1,5 @@
 import Move from "./src/commands/Human/Move";
+import { AgentType } from "./src/enum/AgentType";
 import { Main } from "./src/main";
 const readline = require("readline");
 
@@ -7,7 +8,7 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-const connectAgent = "CIVILIAN";
+const connectAgent = AgentType.POLICE_FORCE;
 
 const app = new Main();
 
@@ -15,7 +16,7 @@ let connect;
 
 connect = app.connect(connectAgent);
 
-connect.on("receiveData", (data) => {
+app.on("receiveData", (data) => {
     // console.log(data.toObject());
 });
 

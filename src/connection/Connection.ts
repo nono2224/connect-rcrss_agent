@@ -3,53 +3,40 @@ import AK_Connect from "./../commands/AK_Connect";
 import { exit } from "process";
 import * as net from "net";
 import ReceiveData from "./ReceiveData";
+import { AgentType } from "../enum/AgentType";
+import { Main } from "../main";
 
 export class Connection extends EventEmitter {
-    agentType: string;
-    agentName: string;
-    requestId: number;
-    port: number;
-    host: string;
-    receiveData: ReceiveData;
+    private receiveData: ReceiveData;
 
-    constructor(agentType: string, agentName: string, requestId: number, port: number, host: string, main) {
+    constructor(private agentType: AgentType, private agentName: string, private requestId: number, private port: number, private host: string, private main: Main) {
         super();
 
-        this.agentType = agentType;
-        this.agentName = agentName;
-        this.requestId = requestId;
-        this.port = port;
-        this.host = host;
         this.receiveData = new ReceiveData();
 
-        (async () => {
-            if (agentType === "POLICE_FORCE") {
-                main.client = await new AK_Connect("POLICE_FORCE", agentName, requestId, port, host).connectToServer();
-            } else if (agentType === "AMBULANCE_TEAM") {
-                main.client = await new AK_Connect("AMBULANCE_TEAM", agentName, requestId, port, host).connectToServer();
-            } else if (agentType === "FIRE_BRIGADE") {
-                main.client = await new AK_Connect("FIRE_BRIGADE", agentName, requestId, port, host).connectToServer();
-            } else if (agentType === "CIVILIAN") {
-                main.client = await new AK_Connect("CIVILIAN", agentName, requestId, port, host).connectToServer();
-            } else {
-                console.error("対象のエージェントが見つかりません");
-                return;
-            }
+        this.connect();
+    }
 
-            main.client.on("data", (data) => {
-                this.receiveData.receive(data, this.emit.bind(this), main);
+    private async connect() {
+        try {
+            const client = await new AK_Connect(this.agentType, this.agentName, this.requestId, this.port, this.host).connectToServer();
+
+            this.main.client = client;
+            this.emit("connected", client);
+
+            client.on("data", (data) => {
+                this.receiveData.receive(data, this.main);
             });
 
-            main.client.on("error", (err) => {
-                //エラーハンドリング
-                console.error("Socket error:", err);
-                // 接続エラーが発生した場合の処理 (例: リトライ、終了)
+            client.on("error", (err) => {
+                this.emit("error", err);
             });
 
-            main.client.on("close", () => {
-                // 接続終了時のイベントハンドラを追加 (任意)
-                console.log("Connection closed.");
+            client.on("close", () => {
+                this.emit("close");
             });
-        })();
+        } catch (error) {
+            this.emit("error", error);
+        }
     }
 }
