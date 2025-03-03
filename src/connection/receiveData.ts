@@ -4,7 +4,7 @@ import * as urn from "../URN/URN";
 import { Main } from "../main";
 
 export default class ReceiveData {
-    buffer;
+    buffer: Buffer;
 
     constructor() {
         this.buffer = Buffer.alloc(0);

@@ -22,7 +22,9 @@ export class Main extends EventEmitter {
                 rejects(err);
             });
 
-            connection.on("close", () => {});
+            connection.on("close", () => {
+                this.emit("close");
+            });
         });
     }
 
