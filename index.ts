@@ -1,4 +1,6 @@
 import Move from "./src/commands/Human/Move";
+import { Clear } from "./src/commands/Human/police/Clear";
+import { ClearArea } from "./src/commands/Human/police/ClearArea";
 import { AgentType } from "./src/enum/AgentType";
 import { Main } from "./src/main";
 const readline = require("readline");
@@ -56,21 +58,11 @@ function promptUser() {
                 parsedPaths.push(num);
             }
 
-            // if (allNumbers) {
-            //     commandQueue.push({
-            //         command: "move",
-            //         agentId: thisAgentId,
-            //         time: -1,
-            //         destinationX: -1,
-            //         destinationY: -1,
-            //         path: parsedPaths,
-            //     });
-            //     console.log("コマンドをキューに追加しました", commandQueue);
-            // } else {
-            //     console.log("数字じゃないのが入ってるぞ");
-            // }
-
-            app.sendCommand(new Move(-1, -1, parsedPaths));
+            if (allNumbers) {
+                app.sendCommand(new Move(-1, -1, parsedPaths));
+            } else {
+                console.log("数字じゃないのが入ってるぞ");
+            }
 
             currentState = "COMMAND_SELECT"; // コマンド選択状態に戻る
             promptUser();
@@ -79,16 +71,11 @@ function promptUser() {
         rl.question("がれきを選択 <id>: ", (answer) => {
             const parsedId = parseInt(answer);
 
-            // if (!isNaN(parsedId)) {
-            //     commandQueue.push({
-            //         command: "clear",
-            //         agentId: thisAgentId,
-            //         time: -1,
-            //         agent_id: parsedId,
-            //     });
-            // } else {
-            //     console.log("数字じゃないのが入ってるぞ");
-            // }
+            if (!isNaN(parsedId)) {
+                app.sendCommand(new Clear(parsedId));
+            } else {
+                console.log("数字じゃないのが入ってるぞ");
+            }
             currentState = "COMMAND_SELECT"; // コマンド選択状態に戻る
             promptUser();
         });
@@ -108,26 +95,16 @@ function promptUser() {
             }
 
             if (parsedPaths.length >= 2) {
-                // if (allNumbers) {
-                //     commandQueue.push({
-                //         command: "clear_area",
-                //         agentId: thisAgentId,
-                //         time: -1,
-                //         destinationX: parsedPaths[0],
-                //         destinationY: parsedPaths[1],
-                //     });
-                //     console.log("コマンドをキューに追加しました", commandQueue);
-                // } else {
-                //     console.log("数字じゃないのが入ってるぞ");
-                // }
-                currentState = "COMMAND_SELECT"; // コマンド選択状態に戻る
-                promptUser();
+                if (allNumbers) {
+                    app.sendCommand(new ClearArea(parsedPaths[0], parsedPaths[1]));
+                } else {
+                    console.log("数字じゃないのが入ってるぞ");
+                }
             } else {
                 console.log("少ないぞ");
-
-                currentState = "COMMAND_SELECT"; // コマンド選択状態に戻る
-                promptUser();
             }
+            currentState = "COMMAND_SELECT"; // コマンド選択状態に戻る
+            promptUser();
         });
     }
 }

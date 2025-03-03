@@ -1,9 +1,20 @@
-export class Clear {
-    destinationX: number;
-    destinationY: number;
+import Proto from "../../../proto/Proto";
+import HumanCommand from "../HumanCommand";
 
-    constructor(destinationX: number, destinationY: number) {
-        this.destinationX = destinationX;
-        this.destinationY = destinationY;
+export class Clear extends HumanCommand {
+    agent_id;
+
+    constructor(agent_id: number) {
+        super();
+
+        this.agent_id = agent_id;
+    }
+
+    createProto(): Proto {
+        const proto = new Proto("AK_CLEAR");
+
+        proto.setMessageMapEntityIdValue("Target", this.agent_id);
+
+        return proto;
     }
 }
