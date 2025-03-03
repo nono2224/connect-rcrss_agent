@@ -22,6 +22,10 @@ app.on("receiveData", (data) => {
     // console.log(data.toObject());
 });
 
+app.on("close", () => {
+    process.exit();
+});
+
 let currentState = "COMMAND_SELECT"; // 現在の状態を追跡する変数
 
 function promptUser() {
